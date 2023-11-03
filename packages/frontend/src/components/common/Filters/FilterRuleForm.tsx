@@ -1,4 +1,3 @@
-import { Colors } from '@blueprintjs/core';
 import {
     createFilterRuleFromField,
     fieldId as getFieldId,
@@ -8,12 +7,13 @@ import {
     getFilterRuleWithDefaultValue,
     getFilterTypeFromItem,
 } from '@lightdash/common';
-import { ActionIcon, Box, Menu, Select } from '@mantine/core';
+import { ActionIcon, Box, Menu, Select, Text } from '@mantine/core';
 import { IconDots, IconX } from '@tabler/icons-react';
 import { FC, useCallback, useMemo } from 'react';
 import FieldSelect from '../FieldSelect';
 import MantineIcon from '../MantineIcon';
 import { FilterTypeConfig } from './configs';
+import { useFiltersContext } from './FiltersProvider';
 
 type Props = {
     fields: FilterableField[];
@@ -32,6 +32,7 @@ const FilterRuleForm: FC<Props> = ({
     onDelete,
     onConvertToGroup,
 }) => {
+    const { inModal } = useFiltersContext();
     const activeField = fields.find(
         (field) => getFieldId(field) === filterRule.target.fieldId,
     );
@@ -79,6 +80,7 @@ const FilterRuleForm: FC<Props> = ({
                     <FieldSelect
                         size="xs"
                         disabled={!isEditMode}
+                        withinPortal={inModal}
                         hasGrouping
                         item={activeField}
                         items={fields}
@@ -92,6 +94,7 @@ const FilterRuleForm: FC<Props> = ({
                         size="xs"
                         w="150px"
                         sx={{ flexShrink: 0 }}
+                        withinPortal={inModal}
                         disabled={!isEditMode}
                         value={filterRule.operator}
                         data={filterConfig.operatorOptions}
@@ -120,13 +123,14 @@ const FilterRuleForm: FC<Props> = ({
                         rule={filterRule}
                         onChange={onChange}
                         disabled={!isEditMode}
+                        inModal={inModal}
                     />
                 </>
             ) : (
-                <span style={{ width: '100%', color: Colors.GRAY1 }}>
+                <Text color="dimmed">
                     Tried to reference field with unknown id:{' '}
                     {filterRule.target.fieldId}
-                </span>
+                </Text>
             )}
 
             {isEditMode &&
